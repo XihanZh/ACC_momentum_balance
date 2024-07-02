@@ -1,8 +1,6 @@
 %================ plots for the first draft ===============================
 
 %--- fig1 model configurations 
-load manuscriptvort_ideal.mat
-load figureplot2.mat
 x1=x*1e-3;
 y1=y*1e-3;
 [X,Y]=meshgrid(x1(2:end-1),y1(2:end-1));
@@ -11,12 +9,10 @@ close all
 x0=10;
 y0=10;
 width=800;
-height=400;
+height=1000;
 set(gcf,'position',[x0,y0,width,height])
-% ax(1)=subplot(1,2,1);
-% ax(1).Position=[0.1 0.12 0.2 0.8];% [left bottom width height]
-ax(1)=subplot(1,3,1);
-ax(1).Position=[0.1 0.12 0.18 0.8];% [left bottom width height]
+ax(1)=subplot(2,3,1);
+ax(1).Position=[0.1 0.52 0.18 0.4];% [left bottom width height]
 rho0=999.8;
 plot(rho0*windstress,y1,'LineWidth',2)
 hold on
@@ -24,21 +20,21 @@ plot(rho0*windstressdw,y1,'LineWidth',2)
 grid on
 xlabel('Wind stress [N m^{-2}]')
 ylabel('Meridional distance [km]')
-legend({'reference-wind','double-wind'},'fontsize',10,'Location','best')
+legend({'reference-wind','double-wind'},'fontsize',12,'Location','best')
 title('(a)','position',[0.012 y1(end-1)+20])
 set(gca,'fontsize',14,'ytick',200:200:1800)
 
 
-ax(2)=subplot(1,3,2);
-ax(2).Position=[0.31 0.12 0.15 0.8];
+ax(2)=subplot(2,3,2);
+ax(2).Position=[0.32 0.52 0.18 0.4];% [left bottom width height]
 plot(sflx(96,:),y1,'LineWidth',2)
 grid on
 xlabel('Heat flux [W m^{-2}]')
 title('(b)','position',[-9 y1(end-1)+20])
 set(gca,'fontsize',14,'ytick',[])
 
-ax(3)=subplot(1,3,3);
-ax(3).Position=[0.5 0.12 0.42 0.8];
+ax(3)=subplot(2,3,3);
+ax(3).Position=[0.55 0.52 0.42 0.4];% [left bottom width height]
 imagesc(x1(2:end-1),y1(2:end-1),d(2:end-1,2:end-1)'),axis xy
 colorbar
 caxis([2000 3000])
@@ -54,142 +50,41 @@ colormap(h2,[0,0,0])
 title('(c)','position',[x1(5) y1(end-1)+1])
 set(gca,'fontsize',14,'xtick',200:400:1800,'ytick',[])
 xlabel('Zonal distance [km]')
-print -dpng modeldomain.png
 
-%--- fig2 sst snapshot 
-load figureplot2.mat
-x=x*1e-3;
-y=y*1e-3;
-close all
-imagesc(x,y(2:end),sst(:,2:end)'),axis xy
+ax(4)=subplot(2,3,4);
+ax(4).Position=[0.1 0.08 0.4 0.35];% [left bottom width height]
+imagesc(x1(2:end-1),y1(2:end-1),sst(2:end-1,2:end-1)'),axis xy
 colorbar
 xlabel('Zonal distance [km]')
+set(gca,'fontsize',14,'xtick',200:400:1800,'ytick',200:200:1800)
 ylabel('Meridional distance [km]')
 ylabel(colorbar,'[^{o}C]','fontsize',14)
-set(gca,'fontsize',14)
+% set(gca,'fontsize',14)
 caxis([2 8])
-print -dpng sstsnap.png
+title('(d)','position',[x1(5) y1(end-1)+1])
 
-
-
-%------ Fig3 surface Ekman layer establishment of stage0-------------------
-% surface Ekman transport across mid-latitude where wind stress=0.1 N/m^2
-load medtrans.mat
-t=1:120;
-upd=8;
-surfref=sum(medtransref(:,1:upd),2)/1e6;
-surfhom=sum(medtransuni(:,1:upd),2)/1e6;
-close all
-x0=10;
-y0=10;
-width=800;
-height=400;
-set(gcf,'position',[x0,y0,width,height])
-
-plot(t,surfref,'LineWidth',2)
+ax(5)=subplot(2,3,5);
+ax(5).Position=[0.6 0.08 0.38 0.35];% [left bottom width height]
+plot(tend,y1,'LineWidth',2)
 hold on
-plot(t,surfhom,'LineWidth',2)
+plot(adv,y1,'LineWidth',2)
+plot(cori,y1,'LineWidth',2)
+plot(diss+vis,y1,'LineWidth',2)
+% plot(diss,y1,'LineWidth',2)
+plot(dphi,y1,'LineWidth',2)
+plot(ext,y1,'LineWidth',2)
+% plot(vis,y1,'LineWidth',2)
+plot(res,y1,'k','LineWidth',2)
+% legend({'tendency','advection','Coriolis','bottom friction','PGF(TFS)','wind stress','vertical viscosity','residual'},'fontsize',10,'location','northeast')
+legend({'tendency','advection','Coriolis','friction','TFS','wind stress','residual'},'fontsize',10,'location','northeast')
 grid on
-plot(t,-(mean(tauLx)/1e6)*ones(size(t)),'k--','LineWidth',2)
-xlabel('Time [day]','fontsize',14)
-legend({'stratified','homogenous','theoretical'},'fontsize',14)
-set(gca,'fontsize',14)
-ylabel('[Sv]')
-print -dpng stage0.png
+xlabel('momentum terms [m^{3}s^{-2}]','fontsize',14)
+set(gca,'fontsize',14,'ytick',200:200:1800)
+xlim([-200 200])
+title('(e)','position',[-195 y1(end-1)+1])
+print -dpng ~/Desktop/fig1_modeldomain.png
 
-%-------- Fig4 SSH hovomollers -----------------
-%-- zonally averaged SSH
-load figureplot2.mat
-y1=y*1e-3;
-t=1:120;
-sth=39;
-nth=160;
-close all
-x0=10;
-y0=10;
-width=800;
-height=700;
-set(gcf,'position',[x0,y0,width,height])
-ax(1)=subplot(3,1,1);
-imagesc(t,y1(2:end),etameanhom(t,2:end)'),axis xy
-colorbar
-caxis([-0.04 0.04])
-hold on
-plot(t,y1(sth)*ones(size(t)),'k--')
-plot(t,y1(nth)*ones(size(t)),'k--')
-set(ax(1),'ytick',0:500:2000,'fontsize',14)
-ylabel('Meridional distance [km]')
-ylabel(colorbar,'[m]')
-title('(a)','position',[2 2001])
-
-ax(2)=subplot(3,1,2);
-imagesc(t,y1(2:end),etameanref(t,2:end)'),axis xy
-colorbar
-caxis([-0.04 0.04])
-hold on
-plot(t,y1(sth)*ones(size(t)),'k--')
-plot(t,y1(nth)*ones(size(t)),'k--')
-set(ax(2),'ytick',0:500:2000,'fontsize',14)
-ylabel('Meridional distance [km]')
-ylabel(colorbar,'[m]')
-title('(b)','position',[2 2001])
-
-ax(3)=subplot(3,1,3);
-plot(t,etameanref(:,nth)-etameanref(:,sth),'LineWidth',2)
-hold on
-plot(t,etameanhom(:,nth)-etameanhom(:,sth),'LineWidth',2)
-grid on
-legend({'stratified','homogenous'},'fontsize',14)
-ylabel('[m]')
-xlabel('Time [day]')
-set(ax(3),'fontsize',14)
-title('(c)','position',[2 0.101])
-print -dpng sshstage1.png
-
-
-%---- fig 5 zonal velocity profiles (zonally averaged at mid latitude)
-load zonalu.mat
-t=1:120;
-[T,Z]=meshgrid(t,zc);
-close all
-x0=10;
-y0=10;
-width=800;
-height=500;
-set(gcf,'position',[x0,y0,width,height])
-ax(1)=subplot(2,1,1);
-homprof=nan(size(uprofmidlat_hom));
-homprof(1:end-1,1:end-1)=uprofmidlat_hom(2:end,2:end);
-pcolor(T,Z,homprof')
-shading flat
-colorbar
-caxis([0 1e-2])
-set(ax(1),'fontsize',14,'layer','top')
-ylim([zc(end) zc(1)])
-ylabel('Depth [m]')
-ylabel(colorbar,'[m s^{-1}]','fontsize',14)
-title('(a)','position',[2 0.01])
-
-ax(2)=subplot(2,1,2);
-refprof=nan(size(uprofmidlat_ref));
-refprof(1:end-1,1:end-1)=uprofmidlat_ref(2:end,2:end);
-pcolor(T,Z,refprof')
-shading flat
-colorbar
-caxis([0 1e-2])
-set(ax(1),'fontsize',14,'layer','top')
-ylim([zc(end) zc(1)])
-ylabel('Depth [m]')
-ylabel(colorbar,'[m s^{-1}]','fontsize',14)
-title('(b)','position',[2 0.01])
-set(ax(2),'fontsize',14,'layer','top')
-xlabel('Time [day]')
-print -dpng fig3_uprofile
-
-
-
-
-%------ Fig6 adjustment of bottom Ekman layer---------------
+%---fig3 stage0 and stage 1
 load medtrans.mat
 rgb = get(gca,'colororder');
 wid=1;
@@ -213,29 +108,32 @@ homtot=surfhom+bothom;
 refmean=mean(reshape(reftot,wid,[]),1);% cross mid-latitude
 homean=mean(reshape(homtot,wid,[]),1);% cross mid-latitude
 
+raw=10420*10420*192*192;
+rho0=999.8;
+load mmtdaily.mat
+load figureplot2.mat
 
 close all
 x0=10;
 y0=10;
 width=800;
-height=500;
+height=750;
 set(gcf,'position',[x0,y0,width,height])
-ax(1)=subplot(2,1,1);
-plot(t,-refmeanbot,'LineWidth',2)
+ax(1)=subplot(3,1,1);
+plot(t,surfref,'LineWidth',2)
 hold on
-plot(t,-homeanbot,'LineWidth',2)
-plot(t,surfhom(end)*ones(size(t)),'k--','LineWidth',2)
-
+plot(t,surfhom,'LineWidth',2)
 grid on
-legend({'stratified','homogenous','Ekman transport'},'fontsize',14)
-
-set(ax(1),'fontsize',14)
+plot(t,-(mean(tauLx)/1e6)*ones(size(t)),'k--','LineWidth',2)
+ylim([1.2 1.55])
+xlabel('Time [day]','fontsize',14)
+legend({'stratified','homogenous','theoretical'},'location','best','fontsize',14)
+set(gca,'fontsize',14)
 ylabel('[Sv]')
-ylim([0.4 2.2])
-title('(a)','position',[2 2.21])
+title('(a)','position',[2 1.552])
 
 
-ax(2)=subplot(2,1,2);
+ax(2)=subplot(3,1,2);
 plot(t,refmean,'LineWidth',2)
 hold on
 plot(t,homean,'LineWidth',2)
@@ -243,28 +141,12 @@ grid on
 
 set(ax(2),'fontsize',14)
 ylabel('[Sv]')
-xlabel('Time [day]')
+% xlabel('Time [day]')
 legend({'stratified','homogenous'},'fontsize',14,'location','best')
 ylim([-0.6 1])
 title('(b)','position',[2 1.01])
 
-print -dpng fig4_volume.png
-
-
-
-%------ Fig.7 time series of TFS ----------------------
-% area-averaged stresses 
-raw=10420*10420*192*192;
-rho0=999.8;
-load mmtdaily.mat
-load figureplot2.mat
-close all
-t=1:120;
-x0=10;
-y0=10;
-width=800;
-height=400;
-set(gcf,'position',[x0,y0,width,height])
+ax(3)=subplot(3,1,3);
 plot(t,-rho0*tfsref/raw,'LineWidth',2)
 hold on
 plot(t,-rho0*tfshom/raw,'LineWidth',2)
@@ -273,11 +155,147 @@ grid on
 xlabel('Time [day]')
 ylabel('[N m^{-2}]')
 % ylabel('[m^{4}s^{-2}]')
-legend({'-TFS stratified','-TFS homogenous','wind stress'},'fontsize',14)
+legend({'-TFS stratified','-TFS homogenous','wind stress'},'location','best','fontsize',14)
 set(gca,'fontsize',14,'Layer','top')
-print -dpng TFScomp.png
+title('(c)','position',[2 0.107])
+print -dpng stage1.png
 
-%-- Fig8 isotherm slopes (stage0-2a)
+%---fig4 barotropic flow 
+
+load manuscriptvort_ideal.mat
+load figureplot2.mat
+load zonalu.mat
+y1=y*1e-3;
+t=1:120;
+sth=39;
+nth=160;
+[T,Z]=meshgrid(t,zc);
+
+close all
+x0=10;
+y0=10;
+width=800;
+height=1000;
+set(gcf,'position',[x0,y0,width,height])
+ax(1)=subplot(3,2,1);
+% ax(1).Position=[0.1 0.65 0.38 0.3];% [left bottom width height]
+ax(1).Position=[0.1 0.65 0.36 0.3];% [left bottom width height]
+imagesc(t,y1(2:end),etameanhom(t,2:end)'),axis xy
+caxis([-0.04 0.04])
+hold on
+plot(t,y1(sth)*ones(size(t)),'k--')
+plot(t,y1(nth)*ones(size(t)),'k--')
+set(ax(1),'ytick',0:500:2000,'fontsize',12)
+ylabel('Meridional distance [km]')
+title('(a)','position',[2 2001])
+
+
+ax(2)=subplot(3,2,2);
+% ax(2).Position=[0.55 0.65 0.4 0.3];% [left bottom width height]
+ax(2).Position=[0.52 0.65 0.42 0.3];% [left bottom width height]
+imagesc(t,y1(2:end),etameanref(t,2:end)'),axis xy
+colorbar
+caxis([-0.04 0.04])
+hold on
+plot(t,y1(sth)*ones(size(t)),'k--')
+plot(t,y1(nth)*ones(size(t)),'k--')
+set(ax(2),'ytick',0:500:2000,'fontsize',12)
+ylabel(colorbar,'[m]','fontsize',14)
+title('(b)','position',[2 2001])
+
+
+ax(3)=subplot(3,2,3);
+ax(3).Position=[0.1 0.32 0.36 0.3];% [left bottom width height]
+homprof=nan(size(uprofmidlat_hom));
+homprof(1:end-1,1:end-1)=uprofmidlat_hom(2:end,2:end);
+pcolor(T,Z,homprof')
+shading flat
+% colorbar
+caxis([0 1e-2])
+set(ax(3),'fontsize',12,'layer','top')
+ylim([zc(end) zc(1)])
+ylabel('Depth [m]')
+xlabel('Time [day]')
+% ylabel(colorbar,'[m s^{-1}]','fontsize',14)
+title('(c)','position',[2 0.01])
+
+
+ax(4)=subplot(3,2,4);
+ax(4).Position=[0.52 0.32 0.42 0.3];% [left bottom width height]
+refprof=nan(size(uprofmidlat_ref));
+refprof(1:end-1,1:end-1)=uprofmidlat_ref(2:end,2:end);
+pcolor(T,Z,refprof')
+shading flat
+colorbar
+caxis([0 1e-2])
+set(ax(4),'fontsize',12,'layer','top')
+ylim([zc(end) zc(1)])
+% ylabel('Depth [m]')
+ylabel(colorbar,'[m s^{-1}]','fontsize',14)
+title('(d)','position',[2 0.01])
+set(ax(4),'fontsize',12,'layer','top')
+xlabel('Time [day]')
+
+
+ax(5)=subplot(3,2,5);
+ax(5).Position=[0.1 0.05 0.85 0.2];% [left bottom width height]
+plot(t,etameanref(:,nth)-etameanref(:,sth),'LineWidth',2)
+hold on
+plot(t,etameanhom(:,nth)-etameanhom(:,sth),'LineWidth',2)
+grid on
+legend({'stratified','homogenous'},'fontsize',14)
+ylabel('[m]')
+xlabel('Time [day]')
+set(ax(5),'fontsize',12)
+title('(e)','position',[2 0.101])
+print -dpng BTflow.png
+
+%---fig5 transport separation druing first 4 months and long time
+load timescale.mat
+load figureplot2.mat
+close all
+tshort=1:120;
+tlong=1:100;
+x0=10;
+y0=10;
+width=800;
+height=500;
+set(gcf,'position',[x0,y0,width,height])
+ax(1)=subplot(2,1,1);
+plot(tshort,transref,'LineWidth',2)
+hold on
+plot(tshort,BCref,'LineWidth',2)
+plot(tshort,BTref,'LineWidth',2)
+grid on
+% legend({'total','baroclinic','barotropic'},'fontsize',14,'location','best')
+set(gca,'fontsize',14)
+xlabel('Time [day]')
+ylabel('[Sv]')
+title('(a)','position',[2 15.1])
+% print -dpng transportspinup.png
+
+ax(2)=subplot(2,1,2);
+
+cbar=get(gca,'colororder');
+plot(1:100,trans100,'color',cbar(1,:),'LineWidth',2)
+hold on
+plot(1:100,BC100,'color',cbar(2,:),'LineWidth',2)
+plot(1:100,BT100,'color',cbar(3,:),'LineWidth',2)
+grid on
+plot(101:130,transdw,'-.','color',cbar(1,:),'LineWidth',2)
+plot(101:130,BCdw,'-.','color',cbar(2,:),'LineWidth',2)
+plot(101:130,BTdw,'-.','color',cbar(3,:),'LineWidth',2)
+plot(6*ones(1,100),1:100,'k--','LineWidth',2)
+legend({'total','baroclinic','barotropic','total double-wind','baroclinic double-wind','barotropic double-wind','Year 6'},'fontsize',10,'location','best')
+% set(ax(1),'fontsize',14)
+xlabel('Time [year]')
+ylabel('[Sv]')
+title('(b)','position',[2 100.1])
+set(gca,'fontsize',14)
+print -dpng transport.png
+
+
+%---fig6 isotherm slopes (stage0-2a)
 %- computed from rhoanmination.m
 load Tcontours.mat
 yled=1000:100:1300;
@@ -316,55 +334,94 @@ ylabel('Depth [m]')
 print -dpng fig6_isotherms.png
 
 
-
-
-%-- Fig 9 transport separation druing first 4 months and long time ---------
-load timescale.mat
-load figureplot2.mat
+%---fig7 EP flux sections
+load review.mat
+load blue_red_saturated.mat
+x1=x*1e-3;
+% [X,Z]=meshgrid(x1,zc(2:end-1));
+[X,Z]=meshgrid(x1,zc(2:end));
 close all
-tshort=1:120;
-tlong=1:100;
 x0=10;
 y0=10;
-width=800;
-height=500;
+width=1000;
+height=1000;
 set(gcf,'position',[x0,y0,width,height])
-ax(1)=subplot(2,1,1);
-plot(tshort,transref,'LineWidth',2)
+ax(1)=subplot(2,2,1);
+epavg2anew=nan(size(epavg2a,1),size(epavg2a,2)+1);
+epavg2anew(1:end-1,1:end-2)=epavg2a(2:end,2:end);
+pcolor(X,Z,epavg2anew')
+shading flat
 hold on
-plot(tshort,BCref,'LineWidth',2)
-plot(tshort,BTref,'LineWidth',2)
-grid on
-% legend({'total','baroclinic','barotropic'},'fontsize',14,'location','best')
-set(gca,'fontsize',14)
-xlabel('Time [day]')
-ylabel('[Sv]')
-title('(a)','position',[2 15.1])
-% print -dpng transportspinup.png
+plot(x1,-d(:,96),'-k','LineWidth',2)
+ylim([-d(end,96),zc(1)])
+colorbar
+caxis([-5e-4 5e-4])
+colormap(map)
+set(ax(1),'fontsize',14,'Layer','top')
+xlabel('Zonal distance [km]')
+ylabel('Depth [m]')
+ylabel(colorbar,'[m^{2}s^{-2}]','fontsize',14)
+title('(a)','position',[50 0.1])
 
-ax(2)=subplot(2,1,2);
-
-cbar=get(gca,'colororder');
-plot(1:100,trans100,'color',cbar(1,:),'LineWidth',2)
+ax(2)=subplot(2,2,2);
+% epavg2bnew=nan(size(epavg2b));
+epavg2bnew=nan(size(epavg2b,1),size(epavg2b,2)+1);
+% epavg2bnew(1:end-1,1:end-1)=epavg2b(2:end,2:end);
+epavg2bnew(1:end-1,1:end-2)=epavg2b(2:end,2:end);
+pcolor(X,Z,epavg2bnew')
+shading flat
 hold on
-plot(1:100,BC100,'color',cbar(2,:),'LineWidth',2)
-plot(1:100,BT100,'color',cbar(3,:),'LineWidth',2)
+plot(x1,-d(:,96),'-k','LineWidth',2)
+ylim([-d(end,96),zc(1)])
+colorbar
+caxis([-5e-4 5e-4])
+colormap(map)
+ylabel(colorbar,'[m^{2}s^{-2}]','fontsize',14)
+set(ax(2),'fontsize',14,'Layer','top')
+xlabel('Zonal distance [km]')
+ylabel('Depth [m]')
+title('(b)','position',[50 0.1])
+
+
+ax(3)=subplot(2,2,3);
+% epavgdwnew=nan(size(epavgdw));
+epavgdwnew=nan(size(epavgdw,1),size(epavgdw,2)+1);
+epavgdwnew(1:end-1,1:end-2)=epavgdw(2:end,2:end);
+pcolor(X,Z,epavgdwnew')
+shading flat
+hold on
+plot(x1,-d(:,96),'-k','LineWidth',2)
+ylim([-d(end,96),zc(1)])
+colorbar
+caxis([-5e-4 5e-4])
+colormap(map)
+set(ax(3),'fontsize',14,'Layer','top')
+xlabel('Zonal distance [km]')
+ylabel('Depth [m]')
+title('(c)','position',[50 0.1])
+ylabel(colorbar,'[m^{2}s^{-2}]','fontsize',14)
+
+
+
+ax(4)=subplot(2,2,4);
+plot(eprofs2a(15:end),zc(16:end-1),'LineWidth',2)
+hold on
+plot(eprofs2b(15:end),zc(16:end-1),'LineWidth',2)
+plot(eprofdw(15:end),zc(16:end-1),'LineWidth',2)
 grid on
-plot(101:130,transdw,'-.','color',cbar(1,:),'LineWidth',2)
-plot(101:130,BCdw,'-.','color',cbar(2,:),'LineWidth',2)
-plot(101:130,BTdw,'-.','color',cbar(3,:),'LineWidth',2)
-legend({'total','baroclinic','barotropic','total double-wind','baroclinic double-wind','barotropic double-wind','Year 6'},'fontsize',10,'location','best')
-plot(6*ones(1,100),1:100,'k--','LineWidth',2)
-% set(ax(1),'fontsize',14)
-xlabel('Time [year]')
-ylabel('[Sv]')
-title('(b)','position',[2 100.1])
+ylabel('Depth [m]')
+% title('EP flux [m^{2}s^{-2}]')
+xlabel('[m^{2}s^{-2}]','fontsize',14)
+title('(d)','position',[2e-6 0.1])
 set(gca,'fontsize',14)
-print -dpng transportspinup.png
+legend({'Stage 2a','Stage 2b','double wind'},'fontsize',12,'location','best')
+print -dpng EPfluxsections.png
 
 
 
-%-- Fig 10 time series of heat transport after doubling wind (separate time-mean and time varying field)
+
+
+%---fig 8 time series of heat transport after doubling wind (separate time-mean and time varying field)
 load figureplot2.mat
 cbar=get(gca,'colororder');
 % y1=y*1e-3;
@@ -399,31 +456,8 @@ xlabel('Time [year]','fontsize',14)
 % print -dpng heatransportdweddy.png
 print -dpng fig8_heatflux.png
 
-%===== fig 11 long term meridional transport and SSH hovemolloer============
-% remove long time meridional transport
-% load medtrans.mat
-load figureplot2.mat
-t=1:100;
-y1=y*1e-3;
-close all
-x0=10;
-y0=10;
-width=900;
-height=400;
-set(gcf,'position',[x0,y0,width,height])
+%---fig9 (add one more panel to have the line plot)
 
-imagesc(t,y1(2:end),etameanref100(t,2:end)'),axis xy
-colorbar
-caxis([-0.5 0.5])
-xlabel('Time [year]')
-ylabel('Meridional distance [km]')
-set(gca,'fontsize',14)
-ylabel(colorbar,'[m]')
-
-print -dpng volumeandssh.png
-
-%-- alternatively fig11 (add one more panel to have the line plot)
-%----------------------
 load figureplot2.mat
 sth=39;
 nth=160;
@@ -459,7 +493,7 @@ title('(b)','position',[2 0.801])
 print -dpng fig9_sshslope.png
 
 
-%-- Fig12 isotherm slopes (doubling wind)
+%---fig10 isotherm slopes (doubling wind)
 load Tcontours.mat
 yled=1000:100:1300;
 zled1=-2200;
@@ -489,17 +523,13 @@ plot(yled,zled3*ones(size(yled)),'color',[0.5,0.5,0.5],'LineWidth',2)
 % text(1400,zled1,'Year 6','fontsize',12)
 text(1400,zled2,'reference-wind','fontsize',12)
 text(1400,zled3,'double-wind','fontsize',12)
-print -dpng fig11_isotherms.png
+print -dpng fig9_isotherms.png
 
-%Fig 13 hovomller of SSH and meridional SSH difference after doubling wind
+%---fig 11 hovomller of SSH and meridional SSH difference after doubling wind
 load figureplot2.mat
 y1=y*1e-3;
-% original is sth=39; north=154
-% sth=30;
-% nth=154;
 sth=39;
 nth=160;
-% nth=165;
 close all
 x0=10;
 y0=10;
@@ -512,8 +542,7 @@ imagesc(t,y1(2:end),etameanrefdwhf(t,2:end)'),axis xy
 colorbar
 caxis([-0.5 0.5])
 hold on
-% plot(t,y1(5)*ones(size(t)),'k--','LineWidth',2)
-% plot(t,y1(end-5)*ones(size(t)),'k--','LineWidth',2)
+
 plot(t,y1(sth)*ones(size(t)),'k--','LineWidth',2)
 plot(t,y1(nth)*ones(size(t)),'k--','LineWidth',2)
 set(ax(1),'fontsize',14)
@@ -521,10 +550,9 @@ xlabel('Time [day]')
 ylabel('Meridional distance [km]')
 ylabel(colorbar,'[m]')
 title('(a)','position',[2 2000.1])
-% print -dpng sshmeanovdbhf.png
+
 
 ax(2)=subplot(2,1,2);
-% plot(t,etameanrefdwhf(:,end-5)-etameanrefdwhf(:,5),'LineWidth',2)
 plot(t,etameanrefdwhf(:,nth)-etameanrefdwhf(:,sth),'LineWidth',2)
 grid on
 ylabel('[m]')
@@ -536,9 +564,9 @@ ylim([0.65 0.75])
 title('(b)','position',[2 0.751])
 set(ax(2),'fontsize',14)
 print -dpng sshdiffhov.png
-% print -dpng sshmeanovdbhfdif.png
 
-% %--Fig 14 time seires of TFS in both simulations after doubling wind
+
+%---fig 12 time seires of TFS in both simulations after doubling wind
 %-+meridional transport for stratified & homogenous after doubling wind
 load medtrans.mat
 upd=8;
@@ -589,201 +617,175 @@ title('(b)','Position',[2,0.181])
 set(gca,'fontsize',14)
 print -dpng windtfsdw.png
 
-%======= barotropic structure adjustment ==================================
-% %--Fig15 cross-stream heat fluxes (divergent component)
-load crosflxbc.mat
-load heatmaps.mat
-load figureplot2.mat
-phi2dnewextref=zeros(192,188);
-phi2dnewextref(2:end,:)=phinewref;
-phi2dnewextref(1,:)=phinewref(end,:);
-
-Fdivxref=(phi2dnewextref(2:end,:)-phi2dnewextref(1:end-1,:))/10420;%191*188 u grid 
-Fdivxref1=Fdivxref(:,2:end);% 191*187
-Fdivyref=(phinewref(:,2:end)-phinewref(:,1:end-1))/10420;% 191*187 v grid 
-Fdivyref1=Fdivyref;
-
-% Tdznewref=Tdzref(:,3:end-2);% 192*188
-Tdznewref=etabaref(:,3:end-2);% 192*188
-DXref=(Tdznewref(2:end,:)-Tdznewref(1:end-1,:))/10420;% 191*188 u grid 
-DYref=(Tdznewref(:,2:end)-Tdznewref(:,1:end-1))/10420;% 192*187 v grid 
-DXref1=DXref(:,2:end);% 191*187
-DYref1=DYref(2:end,:);% 191*187
-nmref=sqrt(DXref1.^2+DYref1.^2);% 191*187
-dotabref=Fdivxref1.*DXref1+Fdivyref1.*DYref1;
-crosshflxref=dotabref./nmref;
-
-phi2dnewextdw=zeros(192,188);
-phi2dnewextdw(2:end,:)=phinewdw;
-phi2dnewextdw(1,:)=phinewdw(end,:);
-
-Fdivxdw=(phi2dnewextdw(2:end,:)-phi2dnewextdw(1:end-1,:))/10420;%191*188 u grid 
-Fdivxdw1=Fdivxdw(:,2:end);% 191*187
-Fdivydw=(phinewdw(:,2:end)-phinewdw(:,1:end-1))/10420;% 191*187 v grid 
-Fdivydw1=Fdivydw;
-
-% Tdznewdw=Tdzdw(:,3:end-2);% 192*188
-Tdznewdw=etabardw(:,3:end-2);% 192*188
-DXdw=(Tdznewdw(2:end,:)-Tdznewdw(1:end-1,:))/10420;% 191*188 u grid 
-DYdw=(Tdznewdw(:,2:end)-Tdznewdw(:,1:end-1))/10420;% 192*187 v grid 
-DXdw1=DXdw(:,2:end);% 191*187
-DYdw1=DYref(2:end,:);% 191*187
-nmdw=sqrt(DXdw1.^2+DYdw1.^2);% 191*187
-% dotab=Fdivxref.*DX+Fdivyref.*DY;
-dotabdw=Fdivxdw1.*DXdw1+Fdivydw1.*DYdw1;
-crosshflxdw=dotabdw./nmdw;
-
-
-y1=y*1e-3;
-x1=x*1e-3;
-% tc=1:0.2:2.4;
-tc=-0.3:0.1:0.5;
-[X,Y]=meshgrid(x1(1:end-1),y1(4:end-2));
-
-
-close all
+%======== Appendix
+%---- experiment 1---------
+load acc400mmtexp1.mat
+t=1:10;
 figure
 x0=10;
 y0=10;
-width=800;
+width=1000;
 height=400;
 set(gcf,'position',[x0,y0,width,height])
-ax(1)=subplot(1,2,1);
+ax(1)=subplot(2,2,1);
 ax(1).Position=[0.1 0.12 0.38 0.8];% [left bottom width height]
-imagesc(x1(2:end),y1(4:end-2),crosshflxref'),axis xy
-% colorbar
-% caxis([-20 20])
-caxis([-10 10])
-set(ax(1),'XTick',[],'YTick',[])
-% caxis([-25 25])
-% ylabel(colorbar,'[^{o}C m^{2} s^{-1}]','fontsize',14)
-h2=axes('position',get(ax(1),'position'),'color','none','fontsize',10);
+plot(t,tendts,'LineWidth',2)
 hold on
-[ca,ha]=contour(X,Y,etabaref(1:end-1,4:end-2)',tc,'showtext','off','LineWidth',0.5);
-ha.LevelList=round(ha.LevelList,1);
-colormap(h2,[1,1,1])
-clabel(ca,ha,'manual','fontsize',12)
-% title('cross stream F^{div}_{eddy} reference wind')
+plot(t,advts,'LineWidth',2)
+plot(t,corits,'LineWidth',2)
+% plot(t,dissts,'LineWidth',2)
+plot(t,dissts+vsflxtotts,'LineWidth',2)
+plot(t,dphits,'LineWidth',2)
+plot(t,extts,'LineWidth',2)
+% plot(t,vsflxtotts,'LineWidth',2)
+plot(t,rests,'k','LineWidth',2)
+grid on
+xlabel('Time [year]')
+ylabel('[m^{4}s^{-2}]')
+xlim([1 10])
+legend({'tendency','advection','Coriolis','friction','TFS','wind stress','residual'},'fontsize',11,'Location','best')
+set(ax(1),'fontsize',14,'Layer','top')
+title('(a)','position',[2 1e9+1])
+
+
+ax(2)=subplot(2,2,2);
+ax(2).Position=[0.57 0.6 0.4 0.31];% [left bottom width height]
+z1=9;
+plot(-tend(1:z1),zc(1:z1),'LineWidth',2)
+hold on
+plot(adv(1:z1),zc(1:z1),'LineWidth',2)
+plot(cori(1:z1),zc(1:z1),'LineWidth',2)
+% plot(diss(1:z1),zc(1:z1),'LineWidth',2)
+plot(diss(1:z1)+vsflxtot(1:z1),zc(1:z1),'LineWidth',2)
+plot(dphi(1:z1),zc(1:z1),'LineWidth',2)
+plot(ext(1:z1),zc(1:z1),'LineWidth',2)
+% plot(vsflxtot(1:z1),zc(1:z1),'LineWidth',2)
+plot(res(1:z1),zc(1:z1),'k','LineWidth',2)
+grid on
+xlim([-8e8 8e8])
+ylim([zc(z1) 0])
+ylabel('Depth [m]')
+set(ax(2),'fontsize',14)
+title('(b)','position',[-7.8e8 0.1])
+
+ax(3)=subplot(2,2,4);
+ax(3).Position=[0.57 0.12 0.4 0.31];
+plot(-tend(z1+1:end),zc(z1+1:end),'LineWidth',2)
+hold on
+plot(adv(z1+1:end),zc(z1+1:end),'LineWidth',2)
+plot(cori(z1+1:end),zc(z1+1:end),'LineWidth',2)
+% plot(diss(z1+1:end),zc(z1+1:end),'LineWidth',2)
+plot(diss(z1+1:end)+vsflxtot(z1+1:end),zc(z1+1:end),'LineWidth',2)
+plot(dphi(z1+1:end),zc(z1+1:end),'LineWidth',2)
+plot(ext(z1+1:end),zc(z1+1:end),'LineWidth',2)
+% plot(vsflxtot(z1+1:end),zc(z1+1:end),'c','LineWidth',2)
+plot(res(z1+1:end),zc(z1+1:end),'k','LineWidth',2)
+xlim([-8e8 8e8])
+ylim([zc(end) zc(z1+1)])
+grid on
+title('(c)','position',[-7.8e8 zc(z1+1)+0.1])
+ylabel('Depth [m]')
+xlabel('zonal momentum termmmtexp1.pngs [m^{3}s^{-2}]')
+set(ax(3),'fontsize',14)
+print -dpng ~/Desktop/mmtexp1.png
+
+load newexp2zonalu.mat
+load newexp.mat
+load blue_red_saturated.mat
+y1=y*1e-3;
+x1=x*1e-3;
+
+x0=10;
+y0=10;
+width=1000;
+height=1000;
+set(gcf,'position',[x0,y0,width,height])
+
+ax(1)=subplot(2,2,1);
+imagesc(x1,y1,squeeze(sst(:,:,1))'),axis xy
+colorbar
 xlabel('Zonal distance [km]')
 ylabel('Meridional distance [km]')
-set(gca,'fontsize',14)
-title('(a)','position',[x1(5) y1(end-1)+5])
+set(ax(1),'fontsize',14,'layer','top')
+ylabel(colorbar,'[^{o}C]','fontsize',14)
+title('(a)','position',[50 4001])
 
-ax(2)=subplot(1,2,2);
-ax(2).Position=[0.5 0.12 0.42 0.8];% [left bottom width height]
-imagesc(x1(2:end),y1(4:end-2),crosshflxdw'),axis xy
-colorbar
-% caxis([-20 20])
-caxis([-10 10])
-set(ax(2),'XTick',[],'YTick',[])
-% caxis([-25 25])
-ylabel(colorbar,'[^{o}C m^{2} s^{-1}]','fontsize',14)
-h3=axes('position',get(ax(2),'position'),'color','none','fontsize',10);
+ax(2)=subplot(2,2,2);
+yled=1000:100:1300;
+zled1=-2200;
+zled2=-2400;
+
+
+tc=1:7;
+[Y,Z]=meshgrid(y1,zc);
+
+contour(Y,Z,Tintmean',tc,'LineWidth',2,'ShowText','on')
+set(ax(2),'XTick',[],'Ytick',[])
+colormap(ax(2),[0 0 0])
+h1=axes('position',get(ax(2),'position'),'color','none','fontsize',14);
 hold on
-[cb,hb]=contour(X,Y,etabardw(1:end-1,4:end-2)',tc,'showtext','off','LineWidth',0.5);
-hb.LevelList=round(hb.LevelList,1);
-colormap(h3,[1,1,1])
-clabel(cb,hb,'manual','fontsize',12)
-set(h3,'YTick',[])
-% title('cross stream F^{div}_{eddy} reference wind')
-xlabel('Zonal distance [km]')
-% ylabel('Y [km]')
+contour(Y,Z,Tfinalmean',tc,'LineWidth',2,'ShowText','on')
+colormap(h1,[1 0 0])
+xlabel('Meridional distance [km]')
+ylabel('Depth [m]')
+title('zonally averaged isotherm')
+title('(b)','position',[0.1e3 0])
 set(gca,'fontsize',14)
-title('(b)','position',[x1(5) y1(end-1)+5])
-print -dpng Fdivtheta.png
-
-
-
-
-
-%-- Fig16 time series of SSH contour length ---------
-load sshsenseideal.mat
-close all
-x0=10;
-y0=10;
-width=1000;
-height=400;
-set(gcf,'position',[x0,y0,width,height])
-plot(1:100,mean(sshtsref(:,5:8),2,'omitnan')/1e3,'LineWidth',2)% average over 0.1 to 0.4
-% plot(1:100,mean(sshtsref(:,1:end-1),2,'omitnan'),'LineWidth',2)% average over -0.3 to 0.4
 hold on
-plot(101:130,mean(sshtsdw(:,5:8),2,'omitnan')/1e3,'LineWidth',2)% average over 0.1 to 0.4
-% plot(101:130,mean(sshtsdw(:,1:end-1),2,'omitnan'),'LineWidth',2)% average over -0.3 to 0.4
-grid on
-legend({'reference-wind','double-wind'},'fontsize',14,'Location','best')
-xlabel('Time [year]')
-ylabel('Contour length [km]')
-set(gca,'fontsize',14)
-print -dpng sshtsideal.png
+plot(yled,zled1*ones(size(yled)),'color',[0,0,0],'LineWidth',2)
+plot(yled,zled2*ones(size(yled)),'color',[1,0,0],'LineWidth',2)
+text(1400,zled1,'month 1','fontsize',12)
+text(1400,zled2,'year 30','fontsize',12)
 
 
-
-%-fig15 long time series of SSH and meridional transport of stratified simulation
-load figureplot2.mat
-load medtrans.mat
-close all
-% x0=10;
-% y0=10;
-% width=800;
-% height=500;
-ax(1)=subplot(2,1,1);
-plot(1:100,etameanref100(:,end-5)-etameanref100(:,5),'LineWidth',2)
-hold on
-plot(101:130,etameanrefdw(:,end-5)-etameanrefdw(:,5),'LineWidth',2)
-grid on
-% legend({'reference','double wind'},'fontsize',14)
-% xlabel('Time [year]')
-ylabel('[m]')
-set(gca,'fontsize',14)
-title('(a)','position',[2 1.01])
-% print -dpng sshmeandiff.png
-
-ax(2)=subplot(2,1,2);
-plot(1:100,sum(medtransmid100,2)/1e6,'LineWidth',2)
-hold on
-plot(101:130,sum(medtransmidw,2)/1e6,'LineWidth',2)
-grid on
-ylim([-2e-3 5e-3])
-legend({'stratified reference wind','stratified double wind'},'fontsize',14)
-xlabel('Time [year]')
-ylabel('[Sv]')
-set(gca,'fontsize',14)
-title('(b)','position',[20 5.1e-3])
-print -dpng BTdiag.png
-% print -dpng totmedmidtransdw.png
-
-%-- fig 16 time series of heat transport after doubling wind
-% computed from heatts.m
-load figureplot2.mat
+ax(3)=subplot(2,2,3);
 cbar=get(gca,'colororder');
-% y1=y*1e-3;
-close all
-x0=10;
-y0=10;
-width=1000;
-height=400;
-set(gcf,'position',[x0,y0,width,height])
-la=96;
-
-% ax(1)=subplot(2,1,1);
-plot(1:100,HTEts+HSEts,'LineWidth',2)
+t=31:90;
+plot(t,tendts,'LineWidth',2)
 hold on
-plot(1:100,Hekmants,'LineWidth',2)
-plot(1:100,Htotalts,'LineWidth',2)
-plot(1:100,-Hsuf(la)*ones(size(1:100)),'LineWidth',2)
-plot(101:130,HTEtsdw+HSEtsdw,'-.','color',cbar(1,:),'LineWidth',2)
-plot(101:130,Hekmantsdw,'-.','color',cbar(2,:),'LineWidth',2)
-plot(101:130,Htotaltsdw,'-.','color',cbar(3,:),'LineWidth',2)
-% ylim([-50 100])
+plot(t,advts,'LineWidth',2)
+plot(t,corits,'LineWidth',2)
+% plot(t,dissts,'LineWidth',2)
+plot(t,dissts+vsflxtotts,'LineWidth',2)
+plot(t,dphits,'LineWidth',2)
+plot(t,extts,'LineWidth',2)
+% plot(t,vsflxtotts,'LineWidth',2)
+plot(t,rests,'k','LineWidth',2)
+plot(t,mean(corits)*ones(size(t)),'--','color',cbar(3,:))
+plot(t,mean(dphits)*ones(size(t)),'--','color',cbar(5,:))
 grid on
-legend({'H_{eddy}','H_{Ekman}','H_{total}','H_{surface}',...
-    'H_{eddy} double wind','H_{Ekman} double wind','H_{total} double wind'},'fontsize',12,'location','bestoutside')
-set(gca,'fontsize',14)
-ylabel('[TW]')
-xlabel('Time [year]','fontsize',14)
-print -dpng ~/heatransportdw.png
+xlabel('Time [year]')
+ylabel('[m^{4}s^{-2}]')
+xlim([31 90])
+legend({'tendency','advection','Coriolis','friction','TFS','wind stress','residual'...
+    'time-mean Coriolis','time-mean TFS'},'fontsize',10,'Location','bestoutside')
+set(ax(3),'fontsize',14,'layer','top')
+title('(c)','position',[45 1e9+1])
 
 
 
+ax(4)=subplot(2,2,4);
+[Y,Z]=meshgrid(y1(2:end),zc(2:end-1));
 
+pcolor(Y,Z,squeeze(mean(ep,1,'omitnan'))')
+shading flat
+colorbar
+caxis([-5e-4 5e-4])
+colormap(ax(4),map)
+set(ax(4),'xtick',[],'ytick',[],'Layer','top')
+ylabel(colorbar,'[m^{2}s^{-2}]','fontsize',14)
+% title('EP flux [m^{2}s^{-2}]')
+
+% [Y1,Z1]=meshgrid(y,zc);
+uc=-0.05:0.01:0.05;
+h1=axes('position',get(ax(4),'position'),'color','none','fontsize',14);
+hold on
+contour(Y,Z,umeanyz(2:end,2:end-1)',uc,'LineWidth',2,'Showtext','on')
+colormap(h1,[0 0 0])
+xlabel('Meridional distance [km]')
+ylabel('Depth [m]')
+set(ax(4),'fontsize',14)
+title('(d)','position',[10 1])
+
+print -dpng ~/Desktop/exp2.png
 
